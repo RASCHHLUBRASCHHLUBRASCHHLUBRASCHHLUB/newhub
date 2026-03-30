@@ -2826,15 +2826,12 @@ function redzlib:MakeWindow(Configs)
 
 	-- Mostrar / Esconder a GUI completa
 	function Window:Show()
+		MainFrame.BackgroundTransparency = 0.03
 		MainFrame.Visible = true
-		CreateTween({MainFrame, "BackgroundTransparency", 0.03, 0.2})
 	end
 	
 	function Window:Hide()
-		CreateTween({MainFrame, "BackgroundTransparency", 1, 0.2})
-		task.delay(0.22, function()
-			MainFrame.Visible = false
-		end)
+		MainFrame.Visible = false
 	end
 	
 	function Window:Toggle()
