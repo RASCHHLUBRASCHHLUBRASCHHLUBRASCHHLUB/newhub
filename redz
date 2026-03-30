@@ -1402,15 +1402,19 @@ end
 -- ===== NOVAS FUNÇÕES DE CUSTOMIZAÇÃO =====
 
 -- Muda a cor de fundo principal da lib (Hub 1 e Hub 2)
+-- Os risquinhos das tabs usam tipo "Theme" (acent color), nao o fundo.
+-- Para mudar a cor dos risquinhos, use SetAccentColor().
 function redzlib:SetBackgroundColor(Color1, Color2)
 	if typeof(Color1) == "Color3" then
-		-- Atualiza Hub 2 (fundo sólido)
+		-- Atualiza Hub 2 (fundo sólido dos frames)
 		Theme["Color Hub 2"] = Color1
-		-- Atualiza Hub 1 (gradiente)
-		local r, g, b = Color1.R * 255, Color1.G * 255, Color1.B * 255
-		local r2 = math.clamp(r + 10, 0, 255)
-		local g2 = math.clamp(g + 10, 0, 255)
-		local b2 = math.clamp(b + 10, 0, 255)
+		-- Atualiza Hub 1 (gradiente do MainFrame)
+		local r = math.floor(Color1.R * 255)
+		local g = math.floor(Color1.G * 255)
+		local b = math.floor(Color1.B * 255)
+		local r2 = math.clamp(r + 12, 0, 255)
+		local g2 = math.clamp(g + 12, 0, 255)
+		local b2 = math.clamp(b + 12, 0, 255)
 		Theme["Color Hub 1"] = ColorSequence.new({
 			ColorSequenceKeypoint.new(0.00, Color1),
 			ColorSequenceKeypoint.new(0.50, Color3.fromRGB(r2, g2, b2)),
@@ -1420,7 +1424,7 @@ function redzlib:SetBackgroundColor(Color1, Color2)
 	if typeof(Color2) == "Color3" then
 		Theme["Color Hub 2"] = Color2
 	end
-	-- Reaplicar tema nos instances
+	-- Reaplicar fundo e gradiente em todos os instances registrados
 	table.foreach(redzlib.Instances, function(_, Val)
 		if Val.Type == "Gradient" then
 			Val.Instance.Color = Theme["Color Hub 1"]
@@ -1430,13 +1434,18 @@ function redzlib:SetBackgroundColor(Color1, Color2)
 	end)
 end
 
--- Muda a cor de destaque/tema (botões, sliders, etc)
+-- Muda a cor de destaque/tema (botões, sliders, risquinhos das tabs, etc)
 function redzlib:SetAccentColor(Color)
 	if typeof(Color) == "Color3" then
 		Theme["Color Theme"] = Color
 		table.foreach(redzlib.Instances, function(_, Val)
+			-- "Theme" cobre: risquinhos das tabs (Selected), toggles, indicadores, sliders
+			-- "ScrollBar" cobre: scroll bar das tabs e containers
 			if Val.Type == "Theme" or Val.Type == "ScrollBar" then
-				Val.Instance[GetColor(Val.Instance)] = Color
+				local prop = GetColor(Val.Instance)
+				if prop ~= "" then
+					Val.Instance[prop] = Color
+				end
 			end
 		end)
 	end
@@ -1549,13 +1558,14 @@ function redzlib:MakeWindow(Configs)
 		Make("Corner", TopBar)
 	end
 	if WTopBarImage then
+		-- Imagem fica atras (ZIndex 2), título/botões ficam na frente (ZIndex 3+)
 		Create("ImageLabel", TopBar, {
 			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 			Image = WTopBarImage,
 			ImageTransparency = WTopBarImageTransp,
 			ScaleType = Enum.ScaleType.Crop,
-			ZIndex = 1
+			ZIndex = 2
 		})
 	end
 	
@@ -1569,7 +1579,8 @@ function redzlib:MakeWindow(Configs)
 		TextColor3 = Theme["Color Text"],
 		BackgroundTransparency = 1,
 		Font = Enum.Font.GothamMedium,
-		Name = "Title"
+		Name = "Title",
+		ZIndex = 5
 	}, {
 		InsertTheme(Create("TextLabel", {
 			Size = UDim2.fromScale(0, 1),
@@ -1583,7 +1594,8 @@ function redzlib:MakeWindow(Configs)
 			TextYAlignment = "Bottom",
 			TextSize = 8,
 			Font = Enum.Font.Gotham,
-			Name = "SubTitle"
+			Name = "SubTitle",
+			ZIndex = 5
 		}), "DarkText")
 	}), "Text")
 	
@@ -1672,7 +1684,8 @@ function redzlib:MakeWindow(Configs)
 		BackgroundTransparency = 1,
 		Image = "rbxassetid://10747384394",
 		AutoButtonColor = false,
-		Name = "Close"
+		Name = "Close",
+		ZIndex = 5
 	})
 	
 	local MinimizeButton = SetProps(CloseButton:Clone(), {
@@ -2837,6 +2850,11 @@ function redzlib:MakeWindow(Configs)
 		if typeof(Color) == "Color3" then
 			TopBar.BackgroundColor3 = Color
 			TopBar.BackgroundTransparency = 0
+			-- Garante que título, subtítulo e botões ficam visíveis acima de qualquer imagem
+			Title.ZIndex = 5
+			Title.SubTitle.ZIndex = 5
+			CloseButton.ZIndex = 5
+			MinimizeButton.ZIndex = 5
 		end
 	end
 	
@@ -2848,11 +2866,17 @@ function redzlib:MakeWindow(Configs)
 				Size = UDim2.fromScale(1, 1),
 				BackgroundTransparency = 1,
 				ScaleType = Enum.ScaleType.Crop,
-				ZIndex = 1
+				ZIndex = 2
 			})
 		end
 		img.Image = ImageId
 		img.ImageTransparency = Transparency or 0.6
+		-- Garante que título, subtítulo e botões ficam na frente da imagem
+		img.ZIndex = 2
+		Title.ZIndex = 5
+		Title.SubTitle.ZIndex = 5
+		CloseButton.ZIndex = 5
+		MinimizeButton.ZIndex = 5
 	end
 	
 	-- Mudar cor de fundo do frame principal
