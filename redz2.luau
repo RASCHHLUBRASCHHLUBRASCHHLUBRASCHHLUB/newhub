@@ -9,19 +9,19 @@ local Player = Players.LocalPlayer
 local PlayerMouse = Player:GetMouse()
 
 local redzlib = {
-	Themes = {
-		Darker = {
-			["Color Hub 1"] = ColorSequence.new({
-				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(0, 0, 0)),
-				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(0, 0, 0))
-			}),
-			["Color Hub 2"] = Color3.fromRGB(74, 0, 0),
-			["Color Stroke"] = Color3.fromRGB(105, 0, 0),
-			["Color Theme"] = Color3.fromRGB(255, 0, 0), -- COR DO TOGGLE LIGADO (VERMELHO)
-			["Color Text"] = Color3.fromRGB(255, 255, 255),
-			["Color Dark Text"] = Color3.fromRGB(255, 255, 255)  -- COR DA BOLINHA (PRETA)
-		}
-	},
+    Themes = {
+        PurpleNeon = {
+            ["Color Hub 1"] = ColorSequence.new({
+                ColorSequenceKeypoint.new(0.00, Color3.fromRGB(15, 12, 28)),
+                ColorSequenceKeypoint.new(1.00, Color3.fromRGB(24, 18, 43))
+            }),
+            ["Color Hub 2"] = Color3.fromRGB(35, 25, 60),
+            ["Color Stroke"] = Color3.fromRGB(80, 45, 120),
+            ["Color Theme"] = Color3.fromRGB(170, 85, 255), -- Roxo neon vibrante
+            ["Color Text"] = Color3.fromRGB(240, 240, 255),
+            ["Color Dark Text"] = Color3.fromRGB(180, 170, 210)
+        }
+    },
 	Info = {
 		Version = "1.1.0"
 	},
